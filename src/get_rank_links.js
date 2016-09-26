@@ -26,8 +26,13 @@ function analyzeBody(body) {
 
   let nextPageQuery = null
 
-  $('.resource-showlist .clearfix .fl-info dl dt h3 a').each((i, el) => {
-    links.push($(el).attr('href'))
+  $('.resource-showlist .clearfix').each((i, el) => {
+    let link = $('.fl-info dl dt h3 a', $(el)).attr('href')
+    let point = $('.fl-img a .point em', $(el)).html() * 1
+
+    if(point >= 9) {
+      links.push(link)
+    }
   })
 
   if(!isLastPage) {

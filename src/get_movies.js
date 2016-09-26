@@ -17,6 +17,7 @@ export function fetchMovie(movieUrl) {
       url: movieResourceUrl,
       jar: cookieManager.getCookieJar()
     }, (err, res, body) => {
+
       if(err) {
         reject(err)
         console.info('Fetch failed:', err)

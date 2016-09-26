@@ -6,7 +6,7 @@ import * as getMovies from './get_movies'
 
 const domain = 'http://www.zimuzu.tv'
 const listPageUrl = 'http://www.zimuzu.tv/eresourcelist'
-const startListPageQuery = '?channel=&area=&category=&format=&sort='
+const startListPageQuery = '?page=22&channel=&area=&category=&format=&sort='
 
 if(process.argv.length != 4) {
   console.error('Invalid arguments')
@@ -44,7 +44,7 @@ async function init() {
 
 async function getLinksAndResolve(listPageUrl, listPageQuery) {
 
-  var url = `${listPageUrl}${listPageQuery}`;
+  let url = `${listPageUrl}${listPageQuery}`;
 
   console.log('Try to get link from this URL:', url)
 
@@ -59,6 +59,10 @@ async function getLinksAndResolve(listPageUrl, listPageQuery) {
 
 async function resolveEachLink(links) {
   for (let i = 0; i < links.length; i++) {
-    await getMovies.fetchMovie(`${domain}${links[i]}`)
+    try{
+      await getMovies.fetchMovie(`${domain}${links[i]}`)
+    }catch(e) {
+      console.log('skip error link')
+    }
   }
 }
