@@ -19,6 +19,7 @@ export function fetchMovie(movieUrl) {
     }, (err, res, body) => {
       if(err) {
         reject(err)
+        console.info('Fetch failed:', err)
       }else {
         resolve(analyzeBody(body))
         console.info('Fetched: ', replacement)

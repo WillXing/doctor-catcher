@@ -1,24 +1,26 @@
 import request from 'request'
 
-import getRankLinks from './get_rank_links'
+import getLinksAndNextPage from './get_rank_links'
 import * as LoginManager from './login'
 import * as getMovies from './get_movies'
-import * as cookieManager from './cookie_manage.js'
 
-const listPageUrl = 'http://www.zimuzu.tv/eresourcelist?channel=movie&area=&category=&format=&year=&sort='
+const domain = 'http://www.zimuzu.tv'
+const listPageUrl = 'http://www.zimuzu.tv/eresourcelist'
+const startListPageQuery = '?channel=&area=&category=&format=&sort='
 
 if(process.argv.length != 4) {
   console.error('Invalid arguments')
   console.error('eg. node app.js <username> <password>')
   process.exit(1)
 }
+
 let username = process.argv[2], password = process.argv[3];
 
 init();
 
 async function init() {
 
-  console.info('Login...', username, password)
+  console.info('Login...', username)
 
   let loginRes = await LoginManager.login(username, password)
 
@@ -27,20 +29,11 @@ async function init() {
     process.exit(1)
   }
 
-  //let user = await LoginManager.getUserInfo()
-
   console.info('Login success')
-
-  //console.info('User: ', user.data.userinfo.nickname)
-  //console.info('Level: ', user.data.userinfo.group_name)
-
-  let links = await getRankLinks(listPageUrl)
 
   getMovies.prepareFolder()
 
-  await resolveEachLink(links)
-
-  //await LoginManager.sign()
+  await getLinksAndResolve(listPageUrl, startListPageQuery)
 
   await LoginManager.logout()
 
@@ -48,8 +41,24 @@ async function init() {
 
 }
 
+
+async function getLinksAndResolve(listPageUrl, listPageQuery) {
+
+  var url = `${listPageUrl}${listPageQuery}`;
+
+  console.log('Try to get link from this URL:', url)
+
+  let result = await getLinksAndNextPage(url)
+
+  await resolveEachLink(result.links)
+
+  if(result.nextPageQuery != null) {
+    await getLinksAndResolve(listPageUrl, result.nextPageQuery)
+  }
+}
+
 async function resolveEachLink(links) {
   for (let i = 0; i < links.length; i++) {
-    await getMovies.fetchMovie(links[i])
+    await getMovies.fetchMovie(`${domain}${links[i]}`)
   }
 }

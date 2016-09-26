@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "all": "webpack --config build/webpack.config.babel.js; cd dist; node app.js $ZM_USER $ZM_PASSWORD",
-    "start": "cd dist; node app.js",
+    "start": "cd dist; node app.js $ZM_USER $ZM_PASSWORD",
     "build": "webpack --config build/webpack.config.babel.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

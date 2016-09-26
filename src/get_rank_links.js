@@ -2,7 +2,7 @@ import fs from 'fs'
 import request from 'request'
 import cheerio from 'cheerio'
 
-export default function getLinksWrap(url) {
+export default function getLinksAndNextPageWrap(url) {
   return new Promise((resolve, reject) => {
     request({
       url: url
@@ -10,9 +10,8 @@ export default function getLinksWrap(url) {
       if(err) {
         reject(err)
       }else {
-        let links = analyzeBody(body)
-        //console.log('resolve', links)
-        resolve(links)
+        let analyzeResult = analyzeBody(body)
+        resolve(analyzeResult)
       }
     })
   })
@@ -23,9 +22,20 @@ function analyzeBody(body) {
 
   let links = []
 
-  $('.resource-showlist .clearfix .fl-info dl dt strong a').each((i, el) => {
+  let isLastPage = $('.pages a').last().hasClass('cur')
+
+  let nextPageQuery = null
+
+  $('.resource-showlist .clearfix .fl-info dl dt h3 a').each((i, el) => {
     links.push($(el).attr('href'))
   })
 
-  return links
+  if(!isLastPage) {
+    nextPageQuery = $('.pages a').eq(-2).attr('href')
+  }
+
+  return {
+    links: links,
+    nextPageQuery: nextPageQuery
+  }
 }
