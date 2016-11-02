@@ -128,7 +128,7 @@ function analyzeDoctorNumber(doctorsInfo, numberInfo, date, morning, departId, o
 
 
 export async function catchDoctor(availableDoctorsInfo, domain) {
-  if(fileExists('./result-2/caught.txt')) return true
+  if(fileExists('./result/caught.txt')) return true
 
   let doctors = availableDoctorsInfo.doctors
 
@@ -153,7 +153,7 @@ async function catching(data) {
         console.log(res)
         let resRegx = /成功/g
         if(resRegx.exec(res.msg)) {
-          fs.writeFileSync(`./result-2/caught.txt`, body)
+          fs.writeFileSync(`./result/caught.txt`, body)
         }
         resolve(body)
       }
@@ -210,9 +210,9 @@ function analyzeCatching(body) {
 
 
 export function prepareFolder() {
-  let resPath = path.resolve(`./result-2/`)
-  if (!fileExists(`./result-2/`)) {
-    fs.mkdirSync(`./result-2/`)
+  let resPath = path.resolve(`./result/`)
+  if (!fileExists(`./result/`)) {
+    fs.mkdirSync(`./result/`)
   }
 }
 
