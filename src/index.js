@@ -1,43 +1,56 @@
-import request from 'request'
+import * as Doctor from './check_doctor'
+import * as _ from 'lodash'
 
-import getLinksAndNextPage from './get_rank_links'
-import * as LoginManager from './login'
-import * as getMovies from './get_movies'
+const domain = 'http://www.scgh114.com/'
 
-const domain = 'http://www.zimuzu.tv'
-const listPageUrl = 'http://www.zimuzu.tv/eresourcelist'
-const startListPageQuery = '?page=22&channel=&area=&category=&format=&sort='
+// const openId = "oLRQYuHbg718ojEye15ztikdPeqA"
+const openId = "oLRQYuDCZO5QzyfNiArHBh8g-RL8"
 
-if(process.argv.length != 4) {
-  console.error('Invalid arguments')
-  console.error('eg. node app.js <username> <password>')
-  process.exit(1)
+//const shenID = 273
+const huaxiID = 13
+
+const urlArray = []
+
+let now = new Date().getTime()
+
+for(let i = 14; i <= 15; i++) {
+  let dateTS = new Date(now + i * 24 * 60 * 60 * 1000)
+  let date = `${dateTS.getFullYear()}-${dateTS.getMonth() + 1}-${dateTS.getDate()}`
+  let huaxiMorning = 'weixin/workinfo/index?workdate='+date+'&dutyTime=1&openID=&departId='+huaxiID+"&time="+Date.parse(new Date())
+  // let huaxiAfternoon = 'weixin/workinfo/index?workdate='+date+'&dutyTime=3&openID=&departId='+huaxiID+"&time="+Date.parse(new Date())
+  /*let shenMorning = 'weixin/workinfo/index?workdate='+date+'&dutyTime=1&openID='+openId+'&departId='+shenID+"&time="+Date.parse(new Date())
+  let shenAfternoon = 'weixin/workinfo/index?workdate='+date+'&dutyTime=3&openID='+openId+'&departId='+shenID+"&time="+Date.parse(new Date())*/
+
+  urlArray.push({url: huaxiMorning, date, morning: true, departId: huaxiID})
+  // urlArray.push({url: huaxiAfternoon, date, morning: false, departId: huaxiID})
+  /*urlArray.push({url: shenMorning, date, morning: true})
+  urlArray.push({url: shenAfternoon, date, morning: false})*/
 }
-
-let username = process.argv[2], password = process.argv[3];
 
 init();
 
 async function init() {
 
-  console.info('Login...', username)
+  Doctor.prepareFolder()
 
-  let loginRes = await LoginManager.login(username, password)
+  for (let i = 0; i < urlArray.length; i++) {
+    try{
+      let doctorsInfo = await Doctor.checkDoctorList(`${domain}${urlArray[i].url}`)
 
-  if(loginRes.status != 1) {
-    console.log('Login failed', loginRes.status, loginRes.info)
-    process.exit(1)
+      let availableDoctors = await Doctor.fetchDoctorStatus(doctorsInfo, urlArray[i].date, urlArray[i].morning, urlArray[i].departId, openId)
+
+      let nowDate = new Date()
+      let timeCondition = `${nowDate.getHours()}${nowDate.getMinutes()}${nowDate.getSeconds()}`
+
+      if(availableDoctors.doctors.length != 0 && (timeCondition*1 > 231330)) {
+        await Doctor.catchDoctor(availableDoctors, domain)
+      }
+
+
+    }catch(e) {
+      console.log('skip error:', e)
+    }
   }
-
-  console.info('Login success')
-
-  getMovies.prepareFolder()
-
-  await getLinksAndResolve(listPageUrl, startListPageQuery)
-
-  await LoginManager.logout()
-
-  console.info('Logout success')
 
 }
 
