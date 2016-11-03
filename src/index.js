@@ -3,8 +3,8 @@ import * as _ from 'lodash'
 
 const domain = 'http://www.scgh114.com/'
 
-// const openId = "oLRQYuHbg718ojEye15ztikdPeqA"
-const openId = "oLRQYuDCZO5QzyfNiArHBh8g-RL8"
+const openId = "oLRQYuHbg718ojEye15ztikdPeqA"
+// const openId = "oLRQYuDCZO5QzyfNiArHBh8g-RL8"
 
 //const shenID = 273
 const huaxiID = 13
@@ -16,13 +16,13 @@ let now = new Date().getTime()
 for(let i = 15; i <= 15; i++) {
   let dateTS = new Date(now + i * 24 * 60 * 60 * 1000)
   let date = `${dateTS.getFullYear()}-${dateTS.getMonth() + 1}-${dateTS.getDate()}`
-  let huaxiMorning = 'weixin/workinfo/index?workdate='+date+'&dutyTime=1&openID=&departId='+huaxiID+"&time="+Date.parse(new Date())
-  // let huaxiAfternoon = 'weixin/workinfo/index?workdate='+date+'&dutyTime=3&openID=&departId='+huaxiID+"&time="+Date.parse(new Date())
+  // let huaxiMorning = 'weixin/workinfo/index?workdate='+date+'&dutyTime=1&openID=&departId='+huaxiID+"&time="+Date.parse(new Date())
+  let huaxiAfternoon = 'weixin/workinfo/index?workdate='+date+'&dutyTime=3&openID=&departId='+huaxiID+"&time="+Date.parse(new Date())
   /*let shenMorning = 'weixin/workinfo/index?workdate='+date+'&dutyTime=1&openID='+openId+'&departId='+shenID+"&time="+Date.parse(new Date())
   let shenAfternoon = 'weixin/workinfo/index?workdate='+date+'&dutyTime=3&openID='+openId+'&departId='+shenID+"&time="+Date.parse(new Date())*/
 
-  urlArray.push({url: huaxiMorning, date, morning: true, departId: huaxiID})
-  // urlArray.push({url: huaxiAfternoon, date, morning: false, departId: huaxiID})
+  // urlArray.push({url: huaxiMorning, date, morning: true, departId: huaxiID})
+  urlArray.push({url: huaxiAfternoon, date, morning: false, departId: huaxiID})
   /*urlArray.push({url: shenMorning, date, morning: true})
   urlArray.push({url: shenAfternoon, date, morning: false})*/
 }

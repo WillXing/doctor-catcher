@@ -117,7 +117,7 @@ function analyzeDoctorNumber(doctorsInfo, numberInfo, date, morning, departId, o
   // if (doctors.length > 0) {
   //   let d = new Date()
   //   let time = `${d.getHours()}:${d.getMinutes()}`
-  //   fs.writeFileSync(`./result-2/${doctorsInfo.hospitalNo}=${date}=${morning ? 'morning' : 'afternoon'}=${time}.txt`, JSON.stringify(doctors, null, 2))
+  //   fs.writeFileSync(`./result/${doctorsInfo.hospitalNo}=${date}=${morning ? 'morning' : 'afternoon'}=${time}.txt`, JSON.stringify(doctors, null, 2))
   // }
 
   doctorsInfo.doctors = doctors
@@ -128,7 +128,7 @@ function analyzeDoctorNumber(doctorsInfo, numberInfo, date, morning, departId, o
 
 
 export async function catchDoctor(availableDoctorsInfo, domain) {
-  if(fileExists('./result-2/caught.txt')) return true
+  if(fileExists('./result/caught.txt')) return true
 
   let doctors = availableDoctorsInfo.doctors
 
@@ -153,7 +153,7 @@ async function catching(data) {
         console.log(res)
         let resRegx = /成功/g
         if(resRegx.exec(res.msg)) {
-          fs.writeFileSync(`./result-2/caught.txt`, body)
+          fs.writeFileSync(`./result/caught.txt`, body)
         }
         let notStartRegx = /时间/g
         if(notStartRegx.exec(res.msg)) {
@@ -218,9 +218,9 @@ function analyzeCatching(body) {
 
 
 export function prepareFolder() {
-  let resPath = path.resolve(`./result-2/`)
-  if (!fileExists(`./result-2/`)) {
-    fs.mkdirSync(`./result-2/`)
+  let resPath = path.resolve(`./result/`)
+  if (!fileExists(`./result/`)) {
+    fs.mkdirSync(`./result/`)
   }
 }
 
