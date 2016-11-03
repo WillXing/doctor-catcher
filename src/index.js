@@ -13,7 +13,7 @@ const urlArray = []
 
 let now = new Date().getTime()
 
-for(let i = 14; i <= 15; i++) {
+for(let i = 15; i <= 15; i++) {
   let dateTS = new Date(now + i * 24 * 60 * 60 * 1000)
   let date = `${dateTS.getFullYear()}-${dateTS.getMonth() + 1}-${dateTS.getDate()}`
   let huaxiMorning = 'weixin/workinfo/index?workdate='+date+'&dutyTime=1&openID=&departId='+huaxiID+"&time="+Date.parse(new Date())

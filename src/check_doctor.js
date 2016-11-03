@@ -133,7 +133,7 @@ export async function catchDoctor(availableDoctorsInfo, domain) {
   let doctors = availableDoctorsInfo.doctors
 
   // for(let i=0; i<doctors.length; i++) {
-  for(let i=0; i<1; i++) {
+  for(let i=0; i<2; i++) {
     let registerData = await getRegisterData(`${domain}${doctors[i].catchUrl}`)
     await catching(registerData)
   }
@@ -158,7 +158,7 @@ async function catching(data) {
         let notStartRegx = /时间/g
         if(notStartRegx.exec(res.msg)) {
           let time = new Date()
-          fs.writeFileSync(`./result-2/not_start_${time.getMinutes()}:${time.getSeconds()}`, time.toString())
+          fs.writeFileSync(`./result/not_start_${time.getMinutes()}:${time.getSeconds()}`, time.toString())
         }
 
         console.log('Catch res:', res.msg)
