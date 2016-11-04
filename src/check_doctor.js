@@ -133,7 +133,7 @@ export async function catchDoctor(availableDoctorsInfo, domain) {
   let doctors = availableDoctorsInfo.doctors
 
   // for(let i=0; i<doctors.length; i++) {
-  for(let i=0; i<2; i++) {
+  for(let i=0; i<1; i++) {
     let registerData = await getRegisterData(`${domain}${doctors[i].catchUrl}`)
     await catching(registerData)
   }
@@ -150,7 +150,6 @@ async function catching(data) {
         reject(err)
       } else {
         let res = JSON.parse(body)
-        console.log(res)
         let resRegx = /成功/g
         if(resRegx.exec(res.msg)) {
           fs.writeFileSync(`./result/caught.txt`, body)
@@ -218,9 +217,11 @@ function analyzeCatching(body) {
 
 
 export function prepareFolder() {
-  let resPath = path.resolve(`./result/`)
   if (!fileExists(`./result/`)) {
     fs.mkdirSync(`./result/`)
+  }
+  if (!fileExists(`./logs/`)) {
+    fs.mkdirSync(`./logs/`)
   }
 }
 
