@@ -128,14 +128,17 @@ function analyzeDoctorNumber(doctorsInfo, numberInfo, date, morning, departId, o
 
 
 export async function catchDoctor(availableDoctorsInfo, domain) {
-  if(fileExists('./result/caught.txt')) return true
+  if(fileExists('./result/caught.txt')) {
+    fs.appendFileSync(`./logs/${urlArray[i].date}`, `Already Got`)
+    return true
+  }
 
   let doctors = availableDoctorsInfo.doctors
 
-  // for(let i=0; i<doctors.length; i++) {
-  for(let i=0; i<1; i++) {
+  for(let i=0; i<doctors.length; i++) {
     let registerData = await getRegisterData(`${domain}${doctors[i].catchUrl}`)
-    await catching(registerData)
+    let msg = await catching(registerData)
+    console.log(msg)
   }
 }
 
@@ -152,6 +155,7 @@ async function catching(data) {
         let res = JSON.parse(body)
         let resRegx = /成功/g
         if(resRegx.exec(res.msg)) {
+          fs.appendFileSync(`./logs/${urlArray[i].date}`, `Gotcha!!!`)
           fs.writeFileSync(`./result/caught.txt`, body)
         }
         let notStartRegx = /时间/g

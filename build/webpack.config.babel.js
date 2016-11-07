@@ -28,6 +28,9 @@ export default {
   plugins: [
     new CopyWebpackPlugin([
       { from: 'cookie.json' }
-    ])
+    ]),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: { warnings: false }
+    }),
   ]
 }
