@@ -30,7 +30,7 @@ init();
 async function init() {
 
   Doctor.prepareFolder()
-  await setInterval(resolveLinks, 500)
+  await setInterval(resolveLinks, 1000)
 
 }
 

@@ -128,6 +128,7 @@ function analyzeDoctorNumber(doctorsInfo, numberInfo, date, morning, departId, o
 
 
 export async function catchDoctor(availableDoctorsInfo, domain) {
+  console.log('catching')
   if(fileExists('./result/caught.txt')) {
     fs.appendFileSync(`./logs/${urlArray[i].date}`, `Already Got`)
     return true
@@ -138,7 +139,12 @@ export async function catchDoctor(availableDoctorsInfo, domain) {
   for(let i=0; i<doctors.length; i++) {
     let registerData = await getRegisterData(`${domain}${doctors[i].catchUrl}`)
     let msg = await catching(registerData)
+
     console.log(msg)
+
+    if(msg == 'not_start') {
+      return
+    }
   }
 }
 
@@ -152,21 +158,28 @@ async function catching(data) {
       if (err) {
         reject(err)
       } else {
+        let resolveData;
         let res = JSON.parse(body)
         let resRegx = /成功/g
         if(resRegx.exec(res.msg)) {
           fs.appendFileSync(`./logs/${urlArray[i].date}`, `Gotcha!!!`)
           fs.writeFileSync(`./result/caught.txt`, body)
+          resolveData = 'success'
         }
         let notStartRegx = /时间/g
         if(notStartRegx.exec(res.msg)) {
           let time = new Date()
           fs.writeFileSync(`./result/not_start_${time.getMinutes()}:${time.getSeconds()}`, time.toString())
+          resolveData = 'not_start'
+        }
+        let overRegx = /超过/g
+        if(overRegx.exec(res.msg)) {
+          resolveData = 'over_time'
         }
 
         console.log('Catch res:', res.msg)
 
-        resolve(res.msg)
+        resolve(resolveData)
       }
     })
   });
