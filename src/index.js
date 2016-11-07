@@ -4,7 +4,6 @@ import * as _ from 'lodash'
 
 const domain = 'http://www.scgh114.com/'
 const openIds = ["oLRQYuHbg718ojEye15ztikdPeqA", "oLRQYuDCZO5QzyfNiArHBh8g-RL8"]
-// const openId =
 //const shenID = 273
 const huaxiID = 13
 const urlArray = []
@@ -39,7 +38,7 @@ async function resolveLinks() {
     try {
       let doctorsInfo = await Doctor.checkDoctorList(`${domain}${urlArray[i].url}`)
 
-      let availableDoctors = await Doctor.fetchDoctorStatus(doctorsInfo, urlArray[i].date, urlArray[i].morning, urlArray[i].departId, openIds[i%2])
+      let availableDoctors = await Doctor.fetchDoctorStatus(doctorsInfo, urlArray[i].date, urlArray[i].morning, urlArray[i].departId, openIds)
 
       let nowDate = new Date()
 

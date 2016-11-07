@@ -64,7 +64,7 @@ function analyzeDoctor(body) {
 
 
 }
-export function fetchDoctorStatus(doctorInfo, date, morning, departId, openId) {
+export function fetchDoctorStatus(doctorInfo, date, morning, departId, openIds) {
 
   let url = 'http://www.scgh114.com:80/weixin/doctor/refreshWorkInfo'
 
@@ -86,16 +86,16 @@ export function fetchDoctorStatus(doctorInfo, date, morning, departId, openId) {
       if (err) {
         reject(err)
       } else {
-        resolve(analyzeDoctorNumber(doctorInfo, JSON.parse(body), date, morning, departId, openId))
+        resolve(analyzeDoctorNumber(doctorInfo, JSON.parse(body), date, morning, departId, openIds))
       }
     })
   });
 }
 
-function analyzeDoctorNumber(doctorsInfo, numberInfo, date, morning, departId, openId) {
+function analyzeDoctorNumber(doctorsInfo, numberInfo, date, morning, departId, openIds) {
   let doctors = doctorsInfo.doctors
 
-  _.map(doctors, doctor => {
+  _.map(doctors, (doctor) => {
     let doctorNumberInfo = _.find(numberInfo.data, { workId: doctor.wid })
 
     if (doctorNumberInfo != undefined) {
@@ -104,11 +104,7 @@ function analyzeDoctorNumber(doctorsInfo, numberInfo, date, morning, departId, o
       doctor.count = 0
     }
 
-    doctor.catchUrl = `weixin/workinfo/register?workId=${doctor.wid}&departId=${departId}&openID=${openId}&hospitalNo=${doctorsInfo.hospitalNo}`
-
-    // console.log('Checking:', doctor.name
-    //   , '-- date: ', date
-    //   , '-- count: ', doctor.count)
+    doctor.catchUrl = `weixin/workinfo/register?workId=${doctor.wid}&departId=${departId}&openID=${ morning ? openIds[0] : openIds[1] }&hospitalNo=${doctorsInfo.hospitalNo}`
 
   })
 
@@ -136,14 +132,16 @@ export async function catchDoctor(availableDoctorsInfo, domain) {
 
   let doctors = availableDoctorsInfo.doctors
 
-  for(let i=0; i<doctors.length; i++) {
+  for(let i= doctors.length - 2; i<doctors.length; i++) {
+    if(i<0) {
+      continue
+    }
+
     let registerData = await getRegisterData(`${domain}${doctors[i].catchUrl}`)
     let msg = await catching(registerData)
 
-    console.log(msg)
-
     if(msg == 'not_start') {
-      return
+      break
     }
   }
 }
