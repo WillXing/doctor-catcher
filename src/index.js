@@ -13,12 +13,12 @@ let now = new Date().getTime()
 for (let i = 14; i <= 14; i++) {
   let dateTS = new Date(now + i * 24 * 60 * 60 * 1000)
   let date = `${dateTS.getFullYear()}-${dateTS.getMonth() + 1}-${dateTS.getDate()}`
-  let huaxiMorning = 'weixin/workinfo/index?workdate='+date+'&dutyTime=1&openID=&departId='+huaxiID+"&time="+Date.parse(new Date())
+  let huaxiMorning = 'weixin/workinfo/index?workdate=' + date + '&dutyTime=1&openID=&departId=' + huaxiID + "&time=" + Date.parse(new Date())
   let huaxiAfternoon = 'weixin/workinfo/index?workdate=' + date + '&dutyTime=3&openID=&departId=' + huaxiID + "&time=" + Date.parse(new Date())
   /*let shenMorning = 'weixin/workinfo/index?workdate='+date+'&dutyTime=1&openID='+openId+'&departId='+shenID+"&time="+Date.parse(new Date())
    let shenAfternoon = 'weixin/workinfo/index?workdate='+date+'&dutyTime=3&openID='+openId+'&departId='+shenID+"&time="+Date.parse(new Date())*/
 
-  urlArray.push({url: huaxiMorning, date, morning: true, departId: huaxiID, lastDay: i == 14})
+  urlArray.push({ url: huaxiMorning, date, morning: true, departId: huaxiID, lastDay: i == 14 })
   urlArray.push({ url: huaxiAfternoon, date, morning: false, departId: huaxiID, lastDay: i == 14 })
   /*urlArray.push({url: shenMorning, date, morning: true})
    urlArray.push({url: shenAfternoon, date, morning: false})*/
@@ -29,33 +29,36 @@ init();
 async function init() {
 
   Doctor.prepareFolder()
-  await setInterval(resolveLinks, 1000)
+  await setInterval(resolveLinks, 500)
 
 }
 
 async function resolveLinks() {
   for (let i = 0; i < urlArray.length; i++) {
+
+    let nowDate = new Date()
+
     try {
       let doctorsInfo = await Doctor.checkDoctorList(`${domain}${urlArray[i].url}`)
 
       let availableDoctors = await Doctor.fetchDoctorStatus(doctorsInfo, urlArray[i].date, urlArray[i].morning, urlArray[i].departId, openIds)
 
-      let nowDate = new Date()
 
       if (!urlArray[i].lastDay && availableDoctors.doctors.length != 0) {
 
-        fs.appendFileSync(`./logs/${urlArray[i].date}-${urlArray[i].morning?'morning':'afternoon'}`, `--- Trying Time: ${nowDate.getHours()}:${nowDate.getMinutes()}:${nowDate.getSeconds()}, Doctor Num: [${availableDoctors.doctors.length}], Hospital: ${doctorsInfo.hospitalName}, *** Right to Catch ***\n`)
+        await Doctor.catchDoctor(availableDoctors, domain, urlArray[i].morning, urlArray[i].date, doctorsInfo, nowDate)
 
-        await Doctor.catchDoctor(availableDoctors, domain)
+      }else if(urlArray[i].lastDay && availableDoctors.doctors.length != 0) {
 
-      } else if (urlArray[i].lastDay && availableDoctors.doctors.length != 0 && nowDate.getHours() == 7 && nowDate.getMinutes() >= 15) {
+        if ((urlArray[i].morning && nowDate.getHours() == 7 && nowDate.getMinutes() >= 15) || (!urlArray[i].morning && nowDate.getHours() == 7 && nowDate.getMinutes() >= 15 && nowDate.getSeconds() >= 10)) {
 
-        fs.appendFileSync(`./logs/${urlArray[i].date}-${urlArray[i].morning?'morning':'afternoon'}`, `--- Trying Time: ${nowDate.getHours()}:${nowDate.getMinutes()}:${nowDate.getSeconds()}, Doctor Num: [${availableDoctors.doctors.length}], Hospital: ${doctorsInfo.hospitalName}, *** Right to Catch ***\n`)
+          await Doctor.catchDoctor(availableDoctors, domain, urlArray[i].morning, urlArray[i].date, doctorsInfo, nowDate)
 
-        await Doctor.catchDoctor(availableDoctors, domain)
-      }else {
+        }
 
-        fs.appendFileSync(`./logs/${urlArray[i].date}-${urlArray[i].morning?'morning':'afternoon'}`, `--- Trying Time: ${nowDate.getHours()}:${nowDate.getMinutes()}:${nowDate.getSeconds()}, Doctor Num: [${availableDoctors.doctors.length}], Hospital: ${doctorsInfo.hospitalName}\n`)
+      } else {
+
+        fs.appendFileSync(`./logs/${urlArray[i].date}-${urlArray[i].morning ? 'morning' : 'afternoon'}`, `--- Trying Time: ${nowDate.getHours()}:${nowDate.getMinutes()}:${nowDate.getSeconds()}, Doctor Num: [${availableDoctors.doctors.length}], Hospital: ${doctorsInfo.hospitalName}\n`)
 
       }
 

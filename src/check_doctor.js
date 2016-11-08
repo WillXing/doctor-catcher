@@ -123,7 +123,10 @@ function analyzeDoctorNumber(doctorsInfo, numberInfo, date, morning, departId, o
 }
 
 
-export async function catchDoctor(availableDoctorsInfo, domain) {
+export async function catchDoctor(availableDoctorsInfo, domain, morning, date, doctorsInfo, nowDate) {
+
+  fs.appendFileSync(`./logs/${date}-${morning?'morning':'afternoon'}`, `--- Trying Time: ${nowDate.getHours()}:${nowDate.getMinutes()}:${nowDate.getSeconds()}, Doctor Num: [${availableDoctorsInfo.doctors.length}], Hospital: ${doctorsInfo.hospitalName}, *** Right to Catch ***\n`)
+
   console.log('catching')
   if(fileExists('./result/caught.txt')) {
     fs.appendFileSync(`./logs/${urlArray[i].date}`, `Already Got`)
@@ -138,6 +141,9 @@ export async function catchDoctor(availableDoctorsInfo, domain) {
     }
 
     let registerData = await getRegisterData(`${domain}${doctors[i].catchUrl}`)
+
+    // console.log(doctors[i].catchUrl)
+
     let msg = await catching(registerData)
 
     if(msg == 'not_start') {
@@ -175,7 +181,7 @@ async function catching(data) {
           resolveData = 'over_time'
         }
 
-        console.log('Catch res:', res.msg)
+        console.log('Catch res:', res.msg, 'Time: ', new Date().toString())
 
         resolve(resolveData)
       }
