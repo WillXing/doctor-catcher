@@ -135,14 +135,14 @@ export async function catchDoctor(availableDoctorsInfo, domain, morning, date, d
 
   let doctors = availableDoctorsInfo.doctors
 
-  for(let i= doctors.length - 2; i<doctors.length; i++) {
+  for(let i=doctors.length-1; i<doctors.length; i++) {
     if(i<0) {
       continue
     }
 
     let registerData = await getRegisterData(`${domain}${doctors[i].catchUrl}`)
 
-    // console.log(doctors[i].catchUrl)
+
 
     let msg = await catching(registerData)
 
@@ -162,6 +162,7 @@ async function catching(data) {
       if (err) {
         reject(err)
       } else {
+        let time = new Date()
         let resolveData;
         let res = JSON.parse(body)
         let resRegx = /成功/g
@@ -172,14 +173,16 @@ async function catching(data) {
         }
         let notStartRegx = /时间/g
         if(notStartRegx.exec(res.msg)) {
-          let time = new Date()
           fs.writeFileSync(`./result/not_start_${time.getMinutes()}:${time.getSeconds()}`, time.toString())
           resolveData = 'not_start'
         }
         let overRegx = /超过/g
         if(overRegx.exec(res.msg)) {
+          fs.writeFileSync(`./result/over_time_${time.getMinutes()}:${time.getSeconds()}`, time.toString())
           resolveData = 'over_time'
         }
+
+        fs.appendFileSync(`./result/all_${data.dutytime == 3 ? 'afternoon':'morning'}_${time.getMonth()+1}-${time.getDate()}`, `Doctor: ${data.doctorName} --- ${res.msg} --- ${time.getMinutes()}:${time.getSeconds()}`)
 
         console.log('Catch res:', res.msg, 'Time: ', new Date().toString())
 
@@ -229,11 +232,15 @@ function analyzeCatching(body) {
   let tel = '18202842182'
   let sex = '1'
 
-  return {
+  let a = {
     workrecordid, hospitalno, hospitalname, hospitaid, isRealNameCard, iscertificateid,
     workid, dutydate, doctorid, workDutyTimeNum, dutytime, doctorName, doctorSpecialityName,
     hospitalFlag, openID, type, username, certificateid, card, owner, tel, sex,
   }
+
+  console.log(a)
+
+  return a
 }
 
 

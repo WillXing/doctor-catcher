@@ -48,12 +48,14 @@ async function resolveLinks() {
 
         await Doctor.catchDoctor(availableDoctors, domain, urlArray[i].morning, urlArray[i].date, doctorsInfo, nowDate)
 
-      }else if(urlArray[i].lastDay && availableDoctors.doctors.length != 0) {
+      } else if (urlArray[i].lastDay && availableDoctors.doctors.length != 0) {
 
-        if ((urlArray[i].morning && nowDate.getHours() == 7 && nowDate.getMinutes() >= 15) || (!urlArray[i].morning && nowDate.getHours() == 7 && nowDate.getMinutes() >= 15 && nowDate.getSeconds() >= 10)) {
+        if ((urlArray[i].morning && nowDate.getHours() == 7 && nowDate.getMinutes() >= 15 && nowDate.getSeconds() >= 3) || (!urlArray[i].morning && nowDate.getHours() == 7 && nowDate.getMinutes() >= 15 && nowDate.getSeconds() >= 16)) {
 
           await Doctor.catchDoctor(availableDoctors, domain, urlArray[i].morning, urlArray[i].date, doctorsInfo, nowDate)
 
+        } else {
+          fs.appendFileSync(`./logs/${urlArray[i].date}-${urlArray[i].morning ? 'morning' : 'afternoon'}`, `--- Trying Time: ${nowDate.getHours()}:${nowDate.getMinutes()}:${nowDate.getSeconds()}, Doctor Num: [${availableDoctors.doctors.length}], Hospital: ${doctorsInfo.hospitalName}\n`)
         }
 
       } else {
