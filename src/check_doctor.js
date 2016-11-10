@@ -110,12 +110,6 @@ function analyzeDoctorNumber(doctorsInfo, numberInfo, date, morning, departId, o
 
   _.remove(doctors, doctor => doctor.count == 0)
 
-  // if (doctors.length > 0) {
-  //   let d = new Date()
-  //   let time = `${d.getHours()}:${d.getMinutes()}`
-  //   fs.writeFileSync(`./result/${doctorsInfo.hospitalNo}=${date}=${morning ? 'morning' : 'afternoon'}=${time}.txt`, JSON.stringify(doctors, null, 2))
-  // }
-
   doctorsInfo.doctors = doctors
 
   return doctorsInfo
@@ -127,7 +121,6 @@ export async function catchDoctor(availableDoctorsInfo, domain, morning, date, d
 
   fs.appendFileSync(`./logs/${date}-${morning?'morning':'afternoon'}`, `--- Trying Time: ${nowDate.getHours()}:${nowDate.getMinutes()}:${nowDate.getSeconds()}, Doctor Num: [${availableDoctorsInfo.doctors.length}], Hospital: ${doctorsInfo.hospitalName}, *** Right to Catch ***\n`)
 
-  console.log('catching')
   if(fileExists('./result/caught.txt')) {
     fs.appendFileSync(`./logs/${urlArray[i].date}`, `Already Got`)
     return true
@@ -135,14 +128,12 @@ export async function catchDoctor(availableDoctorsInfo, domain, morning, date, d
 
   let doctors = availableDoctorsInfo.doctors
 
-  for(let i=doctors.length-1; i<doctors.length; i++) {
+  for(let i=0; i<1; i++) {
     if(i<0) {
       continue
     }
 
     let registerData = await getRegisterData(`${domain}${doctors[i].catchUrl}`)
-
-
 
     let msg = await catching(registerData)
 
@@ -157,10 +148,15 @@ async function catching(data) {
     request({
       url: 'http://www.scgh114.com/weixin/registered/registrationByType',
       method: 'POST',
-      form: data
+      form: data,
+      headers: {
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+      }
     }, (err, res, body) => {
       if (err) {
         reject(err)
+        fs.appendFileSync(`./result/error_${data.dutytime == 3 ? 'afternoon':'morning'}_${time.getMonth()+1}-${time.getDate()}`, `Doctor: ${data.doctorName} --- ${err.toString()} --- ${time.getMinutes()}:${time.getSeconds()}\n`)
       } else {
         let time = new Date()
         let resolveData;
@@ -173,16 +169,16 @@ async function catching(data) {
         }
         let notStartRegx = /时间/g
         if(notStartRegx.exec(res.msg)) {
-          fs.writeFileSync(`./result/not_start_${time.getMinutes()}:${time.getSeconds()}`, time.toString())
+          fs.writeFileSync(`./result/not_start_${time.getMinutes()}:${time.getSeconds()}`, time.toString() + '\n')
           resolveData = 'not_start'
         }
         let overRegx = /超过/g
         if(overRegx.exec(res.msg)) {
-          fs.writeFileSync(`./result/over_time_${time.getMinutes()}:${time.getSeconds()}`, time.toString())
+          fs.writeFileSync(`./result/over_time_${time.getMinutes()}:${time.getSeconds()}`, time.toString() + '\n')
           resolveData = 'over_time'
         }
 
-        fs.appendFileSync(`./result/all_${data.dutytime == 3 ? 'afternoon':'morning'}_${time.getMonth()+1}-${time.getDate()}`, `Doctor: ${data.doctorName} --- ${res.msg} --- ${time.getMinutes()}:${time.getSeconds()}`)
+        fs.appendFileSync(`./result/all_${data.dutytime == 3 ? 'afternoon':'morning'}_${time.getMonth()+1}-${time.getDate()}`, `Doctor: ${data.doctorName} --- ${res.msg} --- ${time.getMinutes()}:${time.getSeconds()}\n`)
 
         console.log('Catch res:', res.msg, 'Time: ', new Date().toString())
 
@@ -227,20 +223,16 @@ function analyzeCatching(body) {
   let type = $('#registrationFrom #type').val() || ''
   let username = $('#registrationFrom #username').val() || ''
   let certificateid = $('#registrationFrom #certificateid').val() || ''
-  let card = '0003708577'
+  let card = '000003708577'
   let owner = '刘禹君'
   let tel = '18202842182'
   let sex = '1'
 
-  let a = {
+  return {
     workrecordid, hospitalno, hospitalname, hospitaid, isRealNameCard, iscertificateid,
     workid, dutydate, doctorid, workDutyTimeNum, dutytime, doctorName, doctorSpecialityName,
     hospitalFlag, openID, type, username, certificateid, card, owner, tel, sex,
   }
-
-  console.log(a)
-
-  return a
 }
 
 

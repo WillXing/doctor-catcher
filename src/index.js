@@ -50,7 +50,7 @@ async function resolveLinks() {
 
       } else if (urlArray[i].lastDay && availableDoctors.doctors.length != 0) {
 
-        if ((urlArray[i].morning && nowDate.getHours() == 7 && nowDate.getMinutes() >= 15 && nowDate.getSeconds() >= 3) || (!urlArray[i].morning && nowDate.getHours() == 7 && nowDate.getMinutes() >= 15 && nowDate.getSeconds() >= 16)) {
+        if ((urlArray[i].morning && nowDate.getHours() == 7 && nowDate.getMinutes() >= 15 && nowDate.getSeconds() >= 3) || (!urlArray[i].morning && nowDate.getHours() == 7 && nowDate.getMinutes() >= 15 && nowDate.getSeconds() >= 16) || (urlArray[i].morning && nowDate.getHours() > 7)) {
 
           await Doctor.catchDoctor(availableDoctors, domain, urlArray[i].morning, urlArray[i].date, doctorsInfo, nowDate)
 
