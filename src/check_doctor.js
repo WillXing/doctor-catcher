@@ -133,7 +133,7 @@ export async function catchDoctor(availableDoctorsInfo, domain, morning, date, d
       continue
     }
 
-    let registerData = await getRegisterData(`${domain}${doctors[i].catchUrl}`)
+    let registerData = await getRegisterData(`${domain}${doctors[i].catchUrl}`, nowDate.getSeconds()%2)
 
     let msg = await catching(registerData)
 
@@ -178,7 +178,7 @@ async function catching(data) {
           resolveData = 'over_time'
         }
 
-        fs.appendFileSync(`./result/all_${data.dutytime == 3 ? 'afternoon':'morning'}_${time.getMonth()+1}-${time.getDate()}`, `Doctor: ${data.doctorName} --- ${res.msg} --- ${time.getMinutes()}:${time.getSeconds()}\n`)
+        fs.appendFileSync(`./result/all_${data.dutytime == 3 ? 'afternoon':'morning'}_${time.getMonth()+1}-${time.getDate()}`, `Doctor: ${data.doctorName} --- ${res.msg} --- ${time.getMinutes()}:${time.getSeconds()}\n*********\ncard:${data.card}\nowner:${data.owner}\ntel:${data.tel}\n***End***\n`)
 
         console.log('Catch res:', res.msg, 'Time: ', new Date().toString())
 
@@ -188,7 +188,7 @@ async function catching(data) {
   });
 }
 
-async function getRegisterData(url) {
+async function getRegisterData(url, flag) {
   return new Promise((resolve, reject) => {
     request({
       url: url,
@@ -197,13 +197,13 @@ async function getRegisterData(url) {
         reject(err)
         console.error('Fetch failed:', err)
       } else {
-        resolve(analyzeCatching(body))
+        resolve(analyzeCatching(body, flag))
       }
     })
   })
 }
 
-function analyzeCatching(body) {
+function analyzeCatching(body, flag) {
   let $ = cheerio.load(body, { decodeEntities: false })
   let workrecordid = $('#registrationFrom #workRecordId').val() || ''
   let hospitalno = $('#registrationFrom #hospitalno').val() || ''
@@ -223,8 +223,8 @@ function analyzeCatching(body) {
   let type = $('#registrationFrom #type').val() || ''
   let username = $('#registrationFrom #username').val() || ''
   let certificateid = $('#registrationFrom #certificateid').val() || ''
-  let card = '000003708577'
-  let owner = '刘禹君'
+  let card = flag ? '000003708577' : '0003708577'
+  let owner = flag ? '刘禹君' : '513723199309200024'
   let tel = '18202842182'
   let sex = '1'
 

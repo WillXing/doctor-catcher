@@ -3,7 +3,10 @@ import * as Doctor from './check_doctor'
 import * as _ from 'lodash'
 
 const domain = 'http://www.scgh114.com/'
-const openIds = ["oLRQYuHbg718ojEye15ztikdPeqA", "oLRQYuDCZO5QzyfNiArHBh8g-RL8"]
+const openIds = [
+  "oLRQYuHbg718ojEye15ztikdPeqA",
+  "oLRQYuDCZO5QzyfNiArHBh8g-RL8"
+]
 //const shenID = 273
 const huaxiID = 13
 const urlArray = []
@@ -29,8 +32,15 @@ init();
 async function init() {
 
   Doctor.prepareFolder()
-  await setInterval(resolveLinks, 500)
 
+  setTimeout(test, 500)
+
+}
+
+
+async function test() {
+  await resolveLinks()
+  setTimeout(test, 500)
 }
 
 async function resolveLinks() {
@@ -68,6 +78,8 @@ async function resolveLinks() {
       console.log('skip error:', e)
     }
   }
+
+  return true
 }
 
 async function getLinksAndResolve(listPageUrl, listPageQuery) {
